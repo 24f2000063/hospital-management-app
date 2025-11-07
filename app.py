@@ -1,8 +1,10 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask_bcrypt import Bcrypt
+from flask import render_template, redirect, url_for, flash, request
+from forms import RegistrationForm, LoginForm
 
 project_folder = os.path.abspath(os.path.dirname(__file__))
 
@@ -71,21 +73,107 @@ class Treatment(db.Model):
     notes = db.Column(db.Text)
     appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), unique=True, nullable=False)
 
-
-    
-
-
-
-
-
-
-
 @app.route('/')
+@login_required  # Protect the base URL
 def index():
-    return "Hello, your Hospital Management Server is running!"
+    # This route is now a "gatekeeper" that redirects based on role
+    if current_user.role == 'admin':
+        return redirect(url_for('admin_dashboard'))
+    elif current_user.role == 'doctor':
+        return redirect(url_for('doctor_dashboard'))
+    elif current_user.role == 'patient':
+        return redirect(url_for('patient_dashboard'))
+    else:
+        # Just in case, log them out
+        logout_user()
+        flash('An error occurred. Please log in again.', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/register',methods=['GET','POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    form=RegistrationForm()
+
+    if form.validate_on_submit():
+        
+        existing_user=User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash('This username is already taken. Please Try with Different One','danger')
+            return render_template('register.html', title='Register', form=form)
+        
+        new_user=User(
+            username=form.username.data,
+            role='patient'
+        )
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Your account has been created! You can now log in.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('register.html', title='Register', form=form)
+    
+@app.route('/login',methods=['GET','POST'])
+def login():
+        if current_user.is_authenticated:
+            return redirect(url_for('index'))
+        form=LoginForm()
+
+        if form.validate_on_submit():
+            user=User.query.filter_by(username=form.username.data()).first()
+
+            if user and user.check_password(form.password.data):
+                login_user(user)
+
+                next_url=request.args.get('next')
+                
+                if next_url:
+                    return redirect(url_for(next_url))
+                else:
+                    redirect(url_for('index'))
+
+            else:
+                flash('Login Unsuccessful. Please check username and password.', 'danger')
+
+        return render_template('login.html', title='Login', form=form)
+            
+    
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))           
 
 
+@app.route('/admin_dashboard')
+@login_required
+def admin_dashboard():
+    if current_user.role!= 'admin':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('index'))
+    return f'Hello, Admin {current_user.username}'
 
+@app.route('/doctor_dashboard')
+@login_required
+def doctor_dashboard():
+    if current_user.role != 'doctor':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('index'))
+        
+    return f'Hello, Doctor {current_user.username}' # Placeholder
+
+@app.route('/patient_dashboard')
+@login_required
+def patient_dashboard():
+    if current_user.role != 'patient':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('index'))
+        
+    return f'Hello, Patient {current_user.username}'
 
 
 if __name__ == '__main__':
