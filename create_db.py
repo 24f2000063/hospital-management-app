@@ -1,42 +1,53 @@
-from app import app,db,User,Department
+# Nayi factory 'create_app' ko import karein
+from project import create_app, db
+# Naye models ko import karein
+from project.models import User, Department
 
-def setup():
-    print('creating Database')
+# App ko 'create_app' se banayein
+# Yeh app config (jaise database path) ko load kar dega
+app = create_app()
+
+def setup_database():
+    print("Creating database and tables...")
     db.create_all()
-    print('database created')
+    print("Database and tables created.")
 
-def default_admin():
-    print('checking for exsisting admin')
-
-    admin=User.query.filter_by(role='admin').first()
-
+def create_default_admin():
+    print("Checking for existing admin...")
+    admin = User.query.filter_by(role='admin').first()
+    
     if not admin:
-        default_admin=User(
+        print("Admin user not found. Creating default admin...")
+        default_admin = User(
             username='admin',
             role='admin'
         )
-        default_admin.set_password('password123')
+        default_admin.set_password('admin123')
+        
         db.session.add(default_admin)
         db.session.commit()
-        print('admin created')
+        print("Default admin user 'admin' with password 'admin123' created.")
     else:
-        print('admin user already created')
+        print("Admin user already exists.")
 
-def default_department():
-    department = ['Cardiology', 'Neurology', 'Orthopedics', 'Gastroenterologist' ,'General Medicine','General Surgery']
-    for dept_name in department:
-        dept=Department.query.filter_by(name=dept_name).first()
+def create_default_departments():
+    print("Checking for default departments...")
+    depts = ['Cardiology', 'Neurology', 'Orthopedics', 'Pediatrics', 'General Medicine']
+    
+    for dept_name in depts:
+        dept = Department.query.filter_by(name=dept_name).first()
         if not dept:
-            new_dept=Department(name=dept_name)
+            new_dept = Department(name=dept_name)
             db.session.add(new_dept)
             print(f"Created department: {dept_name}")
+            
     db.session.commit()
+    print("Default departments check complete.")
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
+    # Database operations hamesha 'app_context' ke andar hone chahiye
     with app.app_context():
-        setup()
-        default_admin()
-        default_department()
-        
-
-
+        setup_database()
+        create_default_admin()
+        create_default_departments()

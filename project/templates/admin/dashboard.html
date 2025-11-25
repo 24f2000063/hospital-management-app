@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1 class="mb-4">Admin Dashboard</h1>
+<p class="lead"> Welcome {{current_user.user_name}}</p>
+
+
+<h2 class="h4 mt-5 mb-3">Hospital Statistics</h2>
+<div class="row">
+    <!-- Total Doctors Card -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title ">Total Doctors</h5>
+                <p class="card-text h1">{{doc_count}}</p>
+            </div>
+        </div>
+    </div>
+    <!-- Total Patient Card -->
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Patients</h5>
+                <p class="card-text h1">{{pat_count}}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Appointments Card -->
+     <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Appointments</h5>
+                <p class="card-text h1">{{app_count}}</p>
+            </div>
+        </div>
+     </div>
+
+</div>
+
+<h2 class="h4 mt-5 mb-3">Doctor Management</h2>
+<div class="list-group">
+    <a href="{{ url_for('main.add_doctor') }}" class="list-group-item list-group-item-action">Add a new Doctor</a>
+    <a href="{{ url_for('main.manage_doctors') }}" class="list-group-item list-group-item-action">View & Manage All Doctors</a>
+
+</div>
+
+{% endblock %}

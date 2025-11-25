@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Manage All Appointments</h1>
+</div>
+{% if not all_appointments %}
+<div class="alert alert-info">
+    "No appointment has been booked so far".
+</div>
+{% else %}
+<div class="table-responsive shadow-sm rounded-3">
+    <table class="table table-striped table-hover align-middle mb-0">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Appt. ID</th>
+                <th scope="col">Patient Name</th>
+                <th scope="col">Doctor Name</th>
+                <th scope="col">Department</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in all_appointments %}
+            <tr>
+                <th scope="row">{{appt.id}}</th>
+                <td>{{appt.patient.name}}</td>
+                <td>{{appt.doctor.name}}</td>
+                <td>{{appt.doctor.department.name}}</td>
+                <td>{{appt.date}} at {{appt.time}}</td>
+                <td>
+                    {% if appt.status=='Booked' %}
+                    <span class="badge bg-primary">Booked</span>
+                    {% elif appt.status=='Completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif appt.status == 'Cancelled' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ appt.status }}</span>
+                    {% endif %}
+                </td>
+
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

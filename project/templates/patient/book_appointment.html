@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4 shadow-sm">
+            <h2 class="text-center mb-4">Book an Appointment</h2>
+            
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.department.label(class="form-label") }}
+                    {{ form.department(class="form-select") }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.doctor.label(class="form-label") }}
+                    {{ form.doctor(class="form-select") }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form.date.label(class="form-label") }}
+                        {{ form.date(class="form-control") }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form.time.label(class="form-label") }}
+                        {{ form.time(class="form-control") }}
+                    </div>
+                </div>
+
+                <div class="d-grid mt-3">
+                    {{ form.submit(class="btn btn-success btn-lg") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
