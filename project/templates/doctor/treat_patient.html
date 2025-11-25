@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4 shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Treat Patient</h2>
+                <div class="alert alert-info">
+                    <h5>Patient Details</h5>
+                    <p class="mb-1"><strong>Name:</strong> {{ appt.patient.name }}</p>
+                    <p class="mb-1"><strong>Age/Gender:</strong> {{ appt.patient.age or 'N/A' }} / {{
+                        appt.patient.gender or 'N/A' }}</p>
+                    <p class="mb-0"><strong>Appointment Date:</strong> {{ appt.date }} at {{ appt.time }}</p>
+                </div>
+
+                <hr class="my-4">
+
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.diagnosis.label(class="form-label") }}
+                        {% if form.diagnosis.errors %}
+                        {{form.diagnosis(class="form-control is-invalid",row="3")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.diagnosis.errors %}
+                            <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.diagnosis(class="form-control", rows="3", placeholder="Enter diagnosis details here...")
+                        }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{form.prescription.label(class="form-label")}}
+                        {% if form.prescription.errors %}
+                        {{form.prescription(class="form-control is-invalid",row="3")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.prescription.errors %}
+                            <span>{{error}}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.prescription(class="form-control", rows="4", placeholder="Enter prescription details here...") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{form.notes.label(class="form-label")}}
+                        {% if form.notes.errors %}
+                        {{form.notes(class="form-control is-invalid", row="3")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.notes.errors %}
+                            <span>{{error}}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        {{ form.notes(class="form-control", rows="2", placeholder="Any additional notes (optional)") }}
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,9 @@
-# Nayi factory 'create_app' ko import karein
+
 from project import create_app, db
-# Naye models ko import karein
+
 from project.models import User, Department
 
-# App ko 'create_app' se banayein
-# Yeh app config (jaise database path) ko load kar dega
+
 app = create_app()
 
 def setup_database():
@@ -46,7 +45,7 @@ def create_default_departments():
 
 
 if __name__ == '__main__':
-    # Database operations hamesha 'app_context' ke andar hone chahiye
+
     with app.app_context():
         setup_database()
         create_default_admin()

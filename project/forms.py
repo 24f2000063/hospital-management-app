@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, SelectField , TextAreaField , IntegerField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
 from wtforms.fields import DateField, TimeField
 
 from project.models import User, Department,Doctor
@@ -17,6 +17,13 @@ class RegistrationForm(FlaskForm):
     
     name = StringField('Full Name', 
                        validators=[DataRequired(), Length(min=2, max=100)])
+    
+    age = IntegerField('Age', 
+                       validators=[DataRequired(), NumberRange(min=0, max=120)])
+    
+    gender = SelectField('Gender', 
+                         choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')],
+                         validators=[DataRequired()])
 
     submit = SubmitField('Sign Up')
 
@@ -103,7 +110,11 @@ class BookAppointmentForm(FlaskForm):
         self.doctor.choices = [(doc.id, f"Dr. {doc.name} ({doc.specialization})") for doc in Doctor.query.all()]
         self.doctor.choices.insert(0, (-1, '-- Select Doctor --'))
         
-
+class TreatmentForm(FlaskForm):
+    diagnosis = TextAreaField('Diagnosis', validators=[DataRequired()])
+    prescription = TextAreaField('Prescription', validators=[DataRequired()])
+    notes = TextAreaField('Notes') 
+    submit = SubmitField('Submit Treatment')
 
 
 

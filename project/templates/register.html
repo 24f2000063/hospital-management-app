@@ -10,7 +10,7 @@
             <hr>
             <form method="post" action="">
                 {{form.hidden_tag()}}
-                <div class="mb-3">
+                <div class="mb-2">
                     {{form.name.label(class="form-label")}}
                     {{form.name(class="form-control")}}
                     {% for error in form.name.errors%}
@@ -18,7 +18,7 @@
                     {% endfor %}
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-2">
                     {{form.username.label(class="form-label")}}
                     {{form.username(class="form-control")}}
                     {% for error in form.username.errors %}
@@ -27,7 +27,7 @@
 
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-2">
                     {{form.password.label(class="form-label")}}
                     {{form.password(class="form-control")}}
                     {% for error in form.password.error %}
@@ -35,12 +35,40 @@
                     {% endfor %}
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-2">
                     {{form.confirm_password.label(class="form-label")}}
                     {{form.confirm_password(class="form-control")}}
                     {% for error in form.confirm_password.error %}
                     <span class="text-danger small">{{error}}</span>
                     {% endfor %}
+                </div>
+
+                <div class="mb-2">
+                    {{ form.age.label(class="form-label") }}
+                    {% if form.age.errors %}
+                    {{ form.age(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.age.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.age(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-2">
+                    {{ form.gender.label(class="form-label") }}
+                    {% if form.gender.errors %}
+                    {{ form.gender(class="form-select is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.gender.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.gender(class="form-select") }}
+                    {% endif %}
                 </div>
 
                 <div class="d-grid">
@@ -52,6 +80,8 @@
                     Already Have an account <a href="{{url_for('main.login')}}">Log In</a>
                 </small>
             </div>
+
+
 
 
 

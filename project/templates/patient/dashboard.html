@@ -45,8 +45,15 @@
                             <span class="badge bg-primary">{{ appt.status }}</span>
                         </td>
                         <td>
-                            <!-- Cancel Button ( logic later) -->
-                            <button class="btn btn-sm btn-outline-danger" disabled>Cancel</button>
+                            {% if appt.status == 'Booked' %}
+                            <form action="{{ url_for('main.cancel_appointment', appt_id=appt.id) }}" method="POST"
+                                class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Are you sure you want to cancel this appointment?')">Cancel</button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled>Cancel</button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -58,6 +65,7 @@
     </div>
 </div>
 
+<!-- Medical History (Past Appointments) -->
 <div class="card shadow-sm">
     <div class="card-header bg-secondary text-white">
         <h4 class="mb-0">Medical History</h4>
@@ -66,8 +74,50 @@
         {% if not past_appointments %}
         <p class="text-muted text-center my-3">No medical history found.</p>
         {% else %}
-        <!-- ( fill this table later when we have completed appointments) -->
-        <p>You have past appointments.</p>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Doctor</th>
+                        <th>Diagnosis</th>
+                        <th>Prescription</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in past_appointments %}
+                    <tr>
+                        <td>{{ appt.date }}</td>
+                        <td>Dr. {{ appt.doctor.name }}</td>
+
+                        <td>
+                            {% if appt.treatment %}
+                            {{ appt.treatment.diagnosis }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if appt.treatment %}
+                            {{ appt.treatment.prescription }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if appt.status == 'Cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                            {% elif appt.status == 'Completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% endif %}
     </div>
 </div>

@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash, request, Blueprint
 from flask_login import login_user, logout_user, current_user, login_required
 from project import db, bcrypt
 from project.models import User, Patient, Doctor, Appointment, Treatment, Department
-from project.forms import RegistrationForm, LoginForm, AddDoctorForm,UpdateDoctorForm
+from project.forms import RegistrationForm, LoginForm, AddDoctorForm,UpdateDoctorForm,TreatmentForm
 from sqlalchemy.orm import joinedload
 from project.forms import BookAppointmentForm
 
@@ -45,6 +45,7 @@ def register():
         new_user = User(
             username=form.username.data,
             role='patient'
+
         )
         new_user.set_password(form.password.data)
         db.session.add(new_user)
@@ -53,7 +54,9 @@ def register():
         
         new_patient = Patient(
             name=form.name.data,
-            user_id=new_user.id # Naye user ki ID se link karein
+            user_id=new_user.id,
+            age=form.age.data,     
+            gender=form.gender.data 
         )
         db.session.add(new_patient)
         db.session.commit()
@@ -114,8 +117,18 @@ def doctor_dashboard():
     if current_user.role != 'doctor':
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('main.index'))
+    doctor = current_user.doctor
+
+    upcoming_appointments = Appointment.query.filter_by(
+        doctor_id=doctor.id,
+        status='Booked'
+    ).order_by(Appointment.date.asc(), Appointment.time.asc()).all()
+
+    return render_template('doctor/dashboard.html', 
+                           title='Doctor Dashboard',
+                           upcoming_appointments=upcoming_appointments)
         
-    return f'Hello, Doctor {current_user.username}. Your Dashboard will be created soon .'
+    
 
 @main_routes.route('/patient_dashboard')
 @login_required
@@ -127,12 +140,11 @@ def patient_dashboard():
 
     upcoming_appointments =Appointment.query.filter_by(
         patient_id=patient.id,
-        status='Booked'
-
-    ).order_by(Appointment.date.asc(),Appointment.time.asc()).all()
-    past_appointments = Appointment.query.filter_by(
-        patient_id=patient.id, 
-        status='Completed'
+        status='Booked').order_by(Appointment.date.asc(),Appointment.time.asc()).all()
+    
+    past_appointments = Appointment.query.filter(
+        Appointment.patient_id == patient.id,
+        Appointment.status.in_(['Completed', 'Cancelled']) 
     ).order_by(Appointment.date.desc()).all()
 
         
@@ -278,6 +290,69 @@ def book_appointment():
         flash('Your appointment has been booked successfully!', 'success')
         return redirect(url_for('main.patient_dashboard'))
     return render_template('patient/book_appointment.html', title='Book Appointment', form=form)
+
+@main_routes.route('/patient/cancel_appointment/<int:appt_id>', methods=['POST'])
+@login_required
+def cancel_appointment(appt_id):
+    if current_user.role != 'patient':
+        flash('Permission denied.', 'danger')
+        return redirect(url_for('main.index'))
+    
+
+    appt = Appointment.query.get_or_404(appt_id)
+    
+
+    if appt.patient_id != current_user.patient.id:
+        flash('You cannot cancel someone else\'s appointment!', 'danger')
+        return redirect(url_for('main.patient_dashboard'))
+    
+    
+    if appt.status != 'Cancelled':
+        appt.status = 'Cancelled'
+        db.session.commit()
+        flash('Appointment cancelled successfully.', 'success')
+    else:
+        flash('This appointment is already cancelled.', 'info')
+        
+    return redirect(url_for('main.patient_dashboard'))
+
+@main_routes.route('/doctor/treat_patient/<int:appt_id>', methods=['GET', 'POST'])
+@login_required
+def treat_patient(appt_id):
+    if current_user.role != 'doctor':
+        flash('Permission denied.', 'danger')
+        return redirect(url_for('main.index'))
+    appt = Appointment.query.get_or_404(appt_id)
+    if appt.doctor_id != current_user.doctor.id:
+        flash('You cannot treat a patient not assigned to you.', 'danger')
+        return redirect(url_for('main.doctor_dashboard'))
+    
+    form = TreatmentForm()
+    if form.validate_on_submit():
+        treatment = Treatment(
+            diagnosis=form.diagnosis.data,
+            prescription=form.prescription.data,
+            notes=form.notes.data,
+            appointment_id=appt.id
+        )
+        db.session.add(treatment)
+
+        appt.status = 'Completed'
+        
+        db.session.commit()
+
+        flash('Patient treated successfully!', 'success')
+        return redirect(url_for('main.doctor_dashboard'))
+    
+    return render_template('doctor/treat_patient.html', 
+                           title='Treat Patient', 
+                           form=form, 
+                           appt=appt)
+
+    
+    
+
+
 
 
     

@@ -33,7 +33,7 @@
         <div class="card shadow-sm">
             <div class="card-body text-center">
                 <h5 class="card-title">Total Appointments</h5>
-                <p class="card-text h1">{{app_count}}</p>
+                <p class="card-text h1">{{appt_count}}</p>
             </div>
         </div>
      </div>
@@ -45,6 +45,12 @@
     <a href="{{ url_for('main.add_doctor') }}" class="list-group-item list-group-item-action">Add a new Doctor</a>
     <a href="{{ url_for('main.manage_doctors') }}" class="list-group-item list-group-item-action">View & Manage All Doctors</a>
 
+</div>
+<h2 class="h4 mt-5 mb-3">Appointment Management</h2>
+<div class="list-group mb-5">
+    <a href="{{ url_for('main.manage_appointments') }}" class="list-group-item list-group-item-action">
+        View & Manage All Appointments
+    </a>
 </div>
 
 {% endblock %}
