@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<style>
+    .hero-section {
+       
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                    url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1353&q=80');
+        
+        
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        
+        height: 85vh; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        color: white;
+        text-align: center;
+        border-radius: 0 0 20px 20px; 
+        margin-top: -1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+    }
+    
+    .hero-content p {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.7);
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-hero {
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        transition: transform 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .btn-hero:hover {
+        transform: scale(1.05);
+    }
+    
+    .feature-card {
+        transition: transform 0.3s ease;
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        background-color: #e7f1ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px auto;
+        color: #0d6efd;
+        font-size: 1.5rem;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section shadow-lg">
+    <div class="container hero-content">
+        <h1 class="display-4">Welcome to City Hospital</h1>
+        <p class="lead">Your Health, Our Priority. Experience world-class medical care with seamless appointment booking and digital health records.</p>
+        
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-hero shadow">Login</a>
+                <a href="{{ url_for('main.register') }}" class="btn btn-outline-light btn-hero shadow">Register as Patient</a>
+            {% else %}
+               
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-success btn-hero shadow">Go to Dashboard</a>
+                {% elif current_user.role == 'doctor' %}
+                    <a href="{{ url_for('main.doctor_dashboard') }}" class="btn btn-success btn-hero shadow">Go to Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('main.patient_dashboard') }}" class="btn btn-success btn-hero shadow">Go to Dashboard</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div class="container mb-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-white h-100 shadow-sm feature-card">
+                <div class="icon-circle">
+                    <span>👨‍⚕️</span> 
+                </div>
+                <h4 class="mb-3 text-dark">Expert Doctors</h4>
+                <p class="text-muted">Connect with top specialists across various departments like Cardiology, Neurology, and more.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white h-100 shadow-sm feature-card">
+                <div class="icon-circle">
+                    <span>📅</span>
+                </div>
+                <h4 class="mb-3 text-dark">Easy Booking</h4>
+                <p class="text-muted">Book appointments online instantly. Check real-time doctor availability and schedule visits.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white h-100 shadow-sm feature-card">
+                <div class="icon-circle">
+                    <span>📋</span>
+                </div>
+                <h4 class="mb-3 text-dark">Digital Records</h4>
+                <p class="text-muted">Keep track of your complete medical history, prescriptions, and treatments securely.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

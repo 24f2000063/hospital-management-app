@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        
+        <div class="card p-4 shadow-sm mb-6">
+            <h2 class="text-center mb-4">Find a Doctor</h2>
+
+            <form method="post" action="" class="row g-3">
+                {{form.hidden_tag()}}
+                <div class="col-md-3">
+                    {{form.search_by(class='form-select')}}
+                </div>
+                <div class="col-md-7">
+                    {{form.search_term(class='form-control',placeholder="Enter name or specialization...")}}
+                </div>
+                <div class="col-md-2 d-grid">
+                    {{form.submit(class='btn btn-primary')}}
+                </div>
+            </form>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h4 class="mb-0">Available Doctor</h4>
+            </div>
+            <div class="card-body">
+                {% if not doctors %}
+                <p class="text-center text-muted my-3">No Doctor Found.</p>
+                {%else%}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Department</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in doctors %}
+                            <tr>
+
+                                <td>{{doc.name}}</td>
+                                <td>{{doc.specialization}}</td>
+                                <td>{{doc.department.name}}</td>
+                                <td>
+                                    <a href="{{url_for('main.book_appointment')}}" class="btn btn-sm btn-outline-primary">
+                                        Book Appointment
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+ 
+</div>
+{% endblock %}

@@ -52,3 +52,14 @@ class Treatment(db.Model):
     prescription = db.Column(db.Text, nullable=False)
     notes = db.Column(db.Text)
     appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), unique=True, nullable=False)
+
+class Availability(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.id'), nullable=False)
+    date = db.Column(db.String(20), nullable=False) 
+    start_time = db.Column(db.String(10), nullable=False) 
+    end_time = db.Column(db.String(10), nullable=False) 
+    is_booked = db.Column(db.Boolean, default=False)
+    doctor = db.relationship('Doctor', backref=db.backref('availabilities', lazy=True))
+
+    

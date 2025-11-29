@@ -4,28 +4,29 @@
     <div class="col-md-8">
         <div class="card p-4 shadow-sm">
             <h2 class="text-center mb-4">Book an Appointment</h2>
-            
+
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
-                
+
                 <div class="mb-3">
                     {{ form.department.label(class="form-label") }}
-                    {{ form.department(class="form-select") }}
+                    {{ form.department(class="form-select",id="department_select") }}
                 </div>
 
                 <div class="mb-3">
                     {{ form.doctor.label(class="form-label") }}
-                    {{ form.doctor(class="form-select") }}
+                    {{ form.doctor(class="form-select",id="doctor_select") }}
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         {{ form.date.label(class="form-label") }}
-                        {{ form.date(class="form-control") }}
+                        {{ form.date(class="form-control" , id="date_select") }}
                     </div>
                     <div class="col-md-6 mb-3">
-                        {{ form.time.label(class="form-label") }}
-                        {{ form.time(class="form-control") }}
+                        {{ form.time_slot.label(class="form-label") }}
+                        {{ form.time_slot(class="form-control",id="time_select")  }}
+                        <small id="slotHelp" class="text-muted">Select department, doctor, and date.</small>
                     </div>
                 </div>
 
@@ -36,4 +37,89 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let deptSelect = document.getElementById('department_select');
+        let docSelect = document.getElementById('doctor_select');
+        let dateSelect = document.getElementById('date_select');
+        let timeSelect = document.getElementById('time_select')
+        let slotHelp = document.getElementById('slotHelp')
+
+        deptSelect.addEventListener('change', function () {
+            let deptId = this.value;
+
+            docSelect.innerHTML = '<option value="-1">Loading...</option>'
+            timeSelect.innerHTML = '<option value="-1">-- Select Doctor First --</option>'
+
+            if (deptId == -1) {
+                docSelect.innerHTML = '<option value="-1">-- Select Department First --</option>';
+                return;
+            }
+
+            fetch('/api/doctors/' + deptId)
+                .then(response => response.json())
+                .then(data => {
+                    docSelect.innerHTML = '<option value="-1">-- Select Doctor --</option>';
+                    data.doctors.forEach(doc => {
+                        let option = document.createElement('option');
+                        option.value = doc.id;
+                        option.textContent = doc.name;
+                        docSelect.appendChild(option);
+
+                    });
+                    fetchSlots();
+
+                })
+                .catch(err => {
+                    docSelect.innerHTML = '<option value="-1">Error loading doctors</option>';
+                })
+        });
+        function fetchSlots() {
+            let docID = docSelect.value;
+            let dateVal = dateSelect.value;
+
+            timeSelect.innerHTML = '<option value="-1">Loading...</option>';
+
+            if (docID == -1) {
+                timeSelect.innerHTML = '<option value="-1">-- Select Doctor First --</option>';
+                return;
+            }
+
+            fetch(`/api/get_slots/${docID}/${dateVal}`)
+                .then(response => response.json())
+                .then(data => {
+                    timeSelect.innerHTML = '<option value="-1">-- Select Slot --</option>';
+
+                    if (data.slots.length === 0) {
+                        slotHelp.textContent = "No available slots for this date.";
+                        let option = document.createElement('option');
+                        option.text = "No slots Available";
+                        option.disabled = true;
+                        timeSelect.appendChild(option);
+                    } else {
+                        slotHelp.textContent = `${data.slots.length} slots found`;
+                        data.slots.forEach(slot => {
+                            let option = document.createElement('option')
+                            option.value = slot.id;
+                            option.textContent = slot.label;
+                            timeSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    timeSelect.innerHTML = '<option value="-1">Error loading slots</option>';
+                });
+
+
+        }
+        docSelect.addEventListener('change', fetchSlots);
+        dateSelect.addEventListener('change', fetchSlots);
+
+
+
+    });
+
+</script>
 {% endblock %}
+

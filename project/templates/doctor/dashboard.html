@@ -1,59 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1>Doctor Dashboard</h1>
-            <p class="lead">Welcome, Dr. {{ current_user.doctor.name }}</p>
-        </div>
+<div class="col-md-12 d-flex justify-content-between">
+    <div>
+        <h1>Doctor Dashboard</h1>
+        <p class="lead">Welcome, Dr. {{ current_user.doctor.name }}</p>
     </div>
+    <div>
+        <a href="{{ url_for('main.manage_availability') }}" class="btn btn-info">Set Availability</a>
+    </div>
+</div>
 
-    <!-- Upcoming Appointments Section -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">My Upcoming Appointments</h4>
-        </div>
-        <div class="card-body">
-            {% if not upcoming_appointments %}
-                <p class="text-muted text-center my-3">You have no upcoming appointments.</p>
-            {% else %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Patient Name</th>
-                                <th>Age / Gender</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for appt in upcoming_appointments %}
-                            <tr>
-                                <td>{{ appt.date }}</td>
-                                <td>{{ appt.time }}</td>
-                                <td>{{ appt.patient.name }}</td>
-                                
-                                <!-- Patient Details (Optional check) -->
-                                <td>
-                                    {{ appt.patient.age or '-' }} / {{ appt.patient.gender or '-' }}
-                                </td>
-                                
-                                <td><span class="badge bg-primary">{{ appt.status }}</span></td>
-                                
-                                <td>
-                                    <!-- Link to the 'Treat Patient' page -->
-                                    <a href="{{ url_for('main.treat_patient', appt_id=appt.id) }}" class="btn btn-sm btn-success">
-                                        Treat Patient
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% endif %}
-        </div>
+<!-- Upcoming Appointments Section -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">My Upcoming Appointments</h4>
     </div>
+    <div class="card-body">
+        {% if not upcoming_appointments %}
+        <p class="text-muted text-center my-3">You have no upcoming appointments.</p>
+        {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Patient Name</th>
+                        <th>Age / Gender</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in upcoming_appointments %}
+                    <tr>
+                        <td>{{ appt.date }}</td>
+                        <td>{{ appt.time }}</td>
+                        <td>{{ appt.patient.name }}</td>
+
+                        <!-- Patient Details (Optional check) -->
+                        <td>
+                            {{ appt.patient.age or '-' }} / {{ appt.patient.gender or '-' }}
+                        </td>
+
+                        <td><span class="badge bg-primary">{{ appt.status }}</span></td>
+
+                        <td>
+                            <!-- Link to the 'Treat Patient' page -->
+                            <a href="{{ url_for('main.treat_patient', appt_id=appt.id) }}"
+                                class="btn btn-sm btn-success">
+                                Treat Patient
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
